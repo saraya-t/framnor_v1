@@ -1,0 +1,45 @@
+---
+title: "Readme"
+author: "Jiddu"
+date: "9/21/2021"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Framnor
+
+## Survey
+
+https://docs.google.com/forms/d/e/1FAIpQLSd51QpOFdaLQ5kzW4nRPEfWm1aiD09Zb_ZE6DCJVJqaIlGZJg/viewform
+
+### Survey data
+
+Original copy: /data-raw/Copy of Norsk_Farm questionnaire survey_24.06.2021_for testing (Responses).xlsx 
+
+Current version used in the application: /input/questionnaire_survey_sample_20210823.xlsx
+
+Live data will be integrated later.
+
+## Analysis
+
+The calculations for growout and onland hatchery are the same it's just different data that goes in:
+
+- /R/calculate_stats : Calculations for both growout and onland hatchery
+- /input/set_stat_table_growout.R : This script generates 4 tables in the /input directory with groups information and weights
+- /input/set_stat_table_onland_hatchery.R : This script generates 4 tables in the /input directory with groups information and weights
+
+
+Margarida's original analysis files are:
+
+- /R/archive/growout.R
+- /R/archive/onland-hatchery.R
+
+## Design/Layout
+
+See the pptx files in /www/app_design.
+
+
+

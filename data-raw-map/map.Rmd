@@ -1,0 +1,79 @@
+---
+title: "Map"
+output: html_notebook
+---
+
+# for making map and zones
+
+sonetilhorighet.txt is the list of all farms (about 4000) with zone, lat, long
+Lokaliteter.csv is the list of the current active farms (farm with fish), 
+Norwaymap.zip has the files for generating production zones
+
+Below are the links to examples of the interactive maps we are using:
+https://www.barentswatch.no/fiskehelse/settings 
+https://portal.fiskeridir.no/portal/apps/webappviewer/index.html?id=87d862c458774397a8466b148e3dd147
+
+Saraya
+
+```{r}
+library(tidyverse)
+library(sf)
+library(leaflet)
+```
+
+
+```{r}
+farms_all <- read_table2("sonetilhorighet.txt", locale = locale(decimal_mark = ",")) %>% 
+  mutate_if(is.character, ~ gsub('"', '', .))
+names(farms_all) <- c("loc_nr", "zone", "east_utm", "north_utm", "lon", "lat")
+farms_all
+```
+
+```{r}
+farms_active <- read_csv("Lokaliteter.csv") %>% 
+  rename("loc_nr" = "loknr") %>% 
+  mutate(loc_nr = as.character(loc_nr))
+```
+
+```{r}
+filter(farms_active, !loc_nr %in% farms_all$loc_nr)
+```
+
+```{r}
+getwd()
+Coastline = read_sf(dsn=here::here("data-raw/map/Map_data/"),
+                    layer="Hav_norge")
+Norway = read_sf(dsn=here::here("data-raw/map/Map_data/"),
+                 layer="Norge_N5000")
+Zones = read_sf(dsn=here::here("data-raw/map/Map_data/"),
+                 layer=paste("Produksjon_omraader"))
+```
+
+http://leaflet-extras.github.io/leaflet-providers/preview/index.html
+
+```{r}
+farms <- farms_active %>% 
+  dplyr::left_join(farms_all, by = "loc_nr") %>% 
+  dplyr::mutate(popup = paste0("Loc nr: ", loc_nr, "<br>Zone: ", zone))
+
+question %>% 
+  dplyr::left_join(dplyr::select(farms), by = )
+
+leaflet::leaflet() %>%
+  leaflet::addProviderTiles("Esri.WorldImagery") %>% 
+  leaflet::addPolygons(
+    data = Zones, 
+    color = "#444444", weight = 1, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    # fillColor = ~colorQuantile("YlOrRd", ALAND)(ALAND),
+    highlightOptions = leaflet::highlightOptions(color = "white", weight = 2# ,
+      # bringToFront = TRUE
+      )) %>% 
+  leaflet::addCircleMarkers(
+    data = farms,
+    lng = ~lon, lat = ~lat,
+    stroke = FALSE, radius = 2, 
+    fillColor = "#FFF", fillOpacity = 0.9,
+    popup = ~popup)
+```
+
